@@ -1,0 +1,70 @@
+body {
+	background: #fff;
+	font-family: sans-serif;
+	font-size: 14px;
+	color: #444258;
+	margin: 1em;
+	padding: 0;
+	font-size: 130%;
+}
+
+a {
+	text-decoration: none;
+	outline: none;	/* disable mozilla's dotted box around link */
+	font-weight: bold;
+	color: #4285FF;
+}
+a:hover {
+	text-decoration: none;
+	color: #75A5FF;
+}
+input {
+	outline: none;	/* disable mozilla's dotted box around link */
+	font-size: 130%;
+}
+input[type="text"] {
+	width: 20em;
+}
+
+i {
+	font-style: normal;
+	color: #747380;
+}
+
+img {
+	border: 0;
+}
+
+form {
+	margin: 0;
+	padding: 0;
+}
+
+.clear {
+	position: relative;
+	display: block;
+	clear: both;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 1px;
+	background: transparent;
+	font-size: 1px;
+	line-height: 1px;
+}
+
+pre code {
+	background: black;
+	color: #ccc;
+	font-family: Monaco, monospace;
+	white-space: pre;
+	display: block;
+	padding: 4px;
+	padding-left: 8px;
+	border-left: 4px solid #666;
+}
+
+table {
+	border-collapse: collapse;
+}
+
