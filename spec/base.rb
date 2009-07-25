@@ -2,8 +2,6 @@ ENV['REDIS_URL'] = 'redis://localhost:6379/15'
 
 require File.dirname(__FILE__) + '/../lib/all'
 
-DB.flush_db
-
 require 'bacon'
 require 'mocha/api'
 require 'mocha/object'
@@ -14,7 +12,7 @@ class Bacon::Context
 	def initialize(name, &block)
 		@name = name
 		@before, @after = [
-			[lambda { mocha_setup }],
+			[lambda { mocha_setup ; DB.flush_db }],
 			[lambda { mocha_verify ; mocha_teardown }]
 		]
 		@block = block

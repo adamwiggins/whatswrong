@@ -6,4 +6,12 @@ describe Probe do
 		a.enqueue
 		Probe.pop_queue.id.should == a.id
 	end
+
+	it "returns nil when queue is empty" do
+		Probe.pop_queue.should == nil
+	end
+
+	it "returns nil when queue key doesn't exist" do
+		Probe.pop_queue.should == nil
+	end
 end

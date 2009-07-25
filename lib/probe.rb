@@ -14,7 +14,9 @@ class Probe < Model
 	end
 
 	def self.pop_queue
-		find_by_key DB.pop_head(queue_key)
+		key = DB.pop_head(queue_key)
+		return nil unless key
+		find_by_key key
 	end
 
 	def perform
