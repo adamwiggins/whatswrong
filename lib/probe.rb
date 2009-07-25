@@ -9,8 +9,16 @@ class Probe < Model
 		"#{self}:queue"
 	end
 
-	def queue
+	def enqueue
 		DB.push_tail(Probe.queue_key, db_key)
+	end
+
+	def self.pop_queue
+		find_by_key DB.pop_head(queue_key)
+	end
+
+	def perform
+		puts "running probe"
 	end
 
 	def destroy
