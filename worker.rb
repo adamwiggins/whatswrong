@@ -14,7 +14,7 @@ trap 'INT' do
 end
 
 EM.run do
-	EM.add_periodic_timer(0.5) do
+	EM.add_periodic_timer(1.5) do
 		probe = Probe.pop_queue
 		if probe
 			log "Working #{probe.id} #{probe.state}"

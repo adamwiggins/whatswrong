@@ -13,5 +13,14 @@ end
 
 get '/probes/:id' do
 	@probe = Probe.find_by_id(params[:id])
-	erb :probe
+
+	if @probe.state != 'done'
+		status 202
+	end
+
+	if request.xhr?
+		erb :probe_detail, :layout => false
+	else
+		erb :probe
+	end
 end

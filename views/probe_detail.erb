@@ -1,0 +1,14 @@
+<% if @probe.state == 'start' %>
+	<div>Checking domain...<img src="/images/spinner.gif" /></div>
+<% elsif @probe.state == 'httpreq' %>
+	<div>Checking domain...<img src="/images/check.png" /></div>
+	<div>Sending an HTTP request...<img src="/images/spinner.gif" /></div>
+<% else @probe.state == 'done' %>
+	<div>Checking domain...<img src="/images/check.png" /></div>
+	<div>Sending an HTTP request...<img src="/images/check.png" /></div>
+	<div class="done">
+		<h4>Probe done</h4>
+
+		<p><%= @probe.result %></p>
+	</div>
+<% end %>
