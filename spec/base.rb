@@ -2,6 +2,8 @@ ENV['REDIS_URL'] = 'redis://localhost:6379/15'
 
 require File.dirname(__FILE__) + '/../lib/all'
 
+DB.flush_db
+
 require 'bacon'
 require 'mocha/api'
 require 'mocha/object'

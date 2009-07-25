@@ -1,6 +1,9 @@
 class Probe < Model
+	property :id
 	property :url
 	property :state
+	property :created_at
+	property :updated_at
 
 	def self.queue_key
 		"#{self}:queue"

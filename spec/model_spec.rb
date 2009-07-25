@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/base'
 
 class Person < Model
-	property :name, :age
+	property :id, :name, :age, :created_at
 end
 
 describe Model do
@@ -21,7 +21,7 @@ describe Model do
 	it "saves to the redis db and loads it back again" do
 		age = rand(99).to_s
 		id = Person.create(:name => 'test', :age => age).id
-		person = Person.find(id)
+		person = Person.find_by_id(id)
 		person.name.should == 'test'
 		person.age.should == age
 	end

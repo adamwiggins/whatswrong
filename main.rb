@@ -11,6 +11,6 @@ post '/probes' do
 end
 
 get '/probes/:id' do
-	@probe = Probe.find(params[:id])
+	@probe = Probe.find_by_id(params[:id])
 	erb :probe
 end
