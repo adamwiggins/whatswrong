@@ -20,6 +20,8 @@ EM.run do
 			log "Working #{probe}"
 			probe.perform
 			probe.save
+			probe.enqueue if probe.state != 'done'
+			log "Result: #{probe}"
 		end
 	end
 end
