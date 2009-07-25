@@ -17,11 +17,11 @@ EM.run do
 	EM.add_periodic_timer(0.5) do
 		probe = Probe.pop_queue
 		if probe
-			log "Working #{probe}"
+			log "Working #{probe.id} #{probe.state}"
 			probe.perform
 			probe.save
 			probe.enqueue if probe.state != 'done'
-			log "Result: #{probe}"
+			log "#{probe.id} next state is #{probe.state} #{probe.result ? "and result is #{probe.result}" : ''}"
 		end
 	end
 end

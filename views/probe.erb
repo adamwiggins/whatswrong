@@ -1,13 +1,15 @@
 <h3>Probing <a href="<%= @probe.url %>"><%= @probe.url %></a></h3>
 
-<div>
-	Domain name points at proxy.heroku.com...
-	<img src="/images/check.png" />
-</div>
+<% if @probe.state == 'start' %>
+	<div>Checking domain...<img src="/images/spinner.gif" /></div>
+<% elsif @probe.state == 'httpreq' %>
+	<div>Checking domain...<img src="/images/check.png" /></div>
+	<div>Sending an HTTP request...<img src="/images/spinner.gif" /></div>
+<% else @probe.state == 'done' %>
+	<div class="done">
+		<h4>Probe done</h4>
 
-<div>
-	HTTP status...
-	<img src="/images/spinner.gif" />
-</div>
-
+		<p><%= @probe.result %></p>
+	</div>
+<% end %>
 

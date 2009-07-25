@@ -7,6 +7,7 @@ end
 
 post '/probes' do
 	probe = Probe.create(:url => params[:url].strip.downcase)
+	probe.enqueue
 	redirect "/probes/#{probe.id}"
 end
 

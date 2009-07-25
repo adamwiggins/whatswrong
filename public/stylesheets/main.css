@@ -68,3 +68,10 @@ table {
 	border-collapse: collapse;
 }
 
+.done {
+	padding: 1em;
+	background: #ccf;
+	color: #33a;
+	border: 2px solid #33a;
+}
+
