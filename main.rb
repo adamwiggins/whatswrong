@@ -1,30 +1,16 @@
 require 'sinatra'
-require 'uri'
-require 'restclient'
+require File.dirname(__FILE__) + '/lib/all'
 
 get '/' do
 	erb :home
 end
 
-def check(url)
-	url = url.downcase.strip
-	url = "http://#{url}.heroku.com/" unless url.match(/\./)
-	url = "http://#{url}" unless url.match(/^http:\/\//)
-
-	uri = URI.parse(url)
-	unless `host #{uri.host}`.match(/heroku\.com\.$/)
-		return "#{uri.host} is not hosted on Heroku"
-	end
-
-	begin
-		RestClient.get url
-		return "woot"
-	rescue Object => e
-		return "HTTP status code #{e.code}"
-	end
+post '/probes' do
+	probe = Probe.create(:url => params[:url].strip.downcase)
+	redirect "/probes/#{probe.id}"
 end
 
-post '/' do
-	@result = check(params[:url])
+get '/probes/:id' do
+	@probe = Probe.find(params[:id])
+	erb :probe
 end
-
