@@ -98,6 +98,10 @@ class Probe < Model
 			return :heroku_error
 		end
 
+		if e.http_code == 504 and e.response.body.match(/backlog too deep/i)
+			return :backlog_too_deep
+		end
+
 		return :it_works
 	end
 

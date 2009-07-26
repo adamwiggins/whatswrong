@@ -1,0 +1,29 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td>Your app is overloaded with too many concurrent requests.</td>
+	</tr>
+	<tr>
+		<th>Explanation</th>
+		<td>
+Each <a href="http://heroku.com/how/dynos">dyno</a> can handle a single HTTP request at a time.  This means that if your app takes on average 100ms to render a page, it can handle 10 requests per second.
+
+<p>If your app was to receive 11 or more requests per second on a sustained basis, it would start to accumulate a backlog of unhandled requests.  Eventually, this backlog gets too deep (hundreds of requests piled up), and Heroku's routing mesh will start turning requests away.</p>
+
+<p>Your app is still serving requests, but not all are going to get through.  Think of it like pouring two liters of water into a one-liter container.  Your container still holds that first liter just fine; but the second liter spills and is lost.</p>
+</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+You have three options:
+
+<ul>
+<li><b>Increase your dynos</b> - Go to the My Apps page and click on your app, then click Resources.  Slide the dyno slider on the right up to give yourself more concurrency.  This will cost you $0.05 per dyno per hour.</li>
+<li><b>Optimize your app</b> - If you decrease the amount of time spent serving each requests, you can serve more requests per dyno.  For example, if your app spends on average 50ms serving requests instead of 100ms, that will allow it to process 20 requests per second instead of 10.</li>
+<li><b>Ignore it</b> - It might be a temporary traffic spike, perhaps from being posted to a new aggregator like Digg or Reddit; if you don't care about the lost traffic, you need not take any action, and things will return to normal once the spike subsides.</li>
+</ul>
+
+		</td>
+	</tr>
+</table>
