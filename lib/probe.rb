@@ -102,6 +102,14 @@ class Probe < Model
 			return :backlog_too_deep
 		end
 
+		if e.http_code == 504 and e.response.body.match(/backlog too deep/i)
+			return :backlog_too_deep
+		end
+
+		if e.http_code == 504 and e.response.body.match(/request timed out/i)
+			return :request_timeout
+		end
+
 		return :it_works
 	end
 

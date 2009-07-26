@@ -1,0 +1,25 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td>Your app took too long to serve the request.</td>
+	</tr>
+	<tr>
+		<th>Explanation</th>
+		<td>
+HTTP requests on Heroku have a timeout of 30 seconds.  If a request takes longer than that to serve, then you'll see an HTTP 504 and a request timeout page.  One easy way to create this situation would be to put "sleep 31" into your controller.  Note that this 30 seconds does not include the time it takes to transfer the data across the network, only the time spent in your application code.
+</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+You should look at the code that serves this URL and see what is taking so long.  Web requests should typically be served in less than 500ms, and less than 200ms is ideal.
+
+<p>It might be a simple programming error, such as an infinite loop.</p>
+
+<p>If that's not the case, and in fact the request is taking this long to serve, then you need to move this heavy lifting out of your web process and put it into a worker process that runs in the background.  For example: a feed reader or RSS aggregator might spend several minutes scanning its subscribed RSS feeds looking for new content.  This is the sort of thing that rightly belongs in a background job.</p>
+
+<p>Heroku supports Delayed Job for background jobs.  See <a href="http://docs.heroku.com/background-jobs">the Heroku docs on background jobs</a>.</p>
+
+		</td>
+	</tr>
+</table>
