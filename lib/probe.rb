@@ -114,7 +114,11 @@ class Probe < Model
 			return :request_timeout
 		end
 
-		return :it_works
+		if e.http_code == 504 and e.response.body.match(/request timed out/i)
+			return :request_timeout
+		end
+
+		return :app_exception
 	end
 
 	def result_type
