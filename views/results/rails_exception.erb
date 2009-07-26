@@ -1,0 +1,43 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td>Your Rails app is hitting an exception.</td>
+	</tr>
+	<tr>
+		<th>Explanation</th>
+		<td>
+Running locally or in development mode, Rails will show you a backtrace with the exact line of code that caused the exception.
+
+<p>In production, it shows the generic "We're sorry, something went wrong" message, so as to hide code errors from users.  You, the application developer, are expected to get the backtrace from the logs or from an exception notification service.</p>
+		</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+If your app is new and doesn't get any traffic other than you testing, you can use the heroku logs command to see the recent exception.  Like this:
+
+<pre class="code">
+$ heroku logs
+==&gt; log/production.log &lt;==
+# Logfile created on Sat Jul 25 22:38:12 -0700 2009
+
+Processing MainController#index (for 66.92.2.146 at 2009-07-25 22:39:50) [GET]
+
+RuntimeError (boom):
+  app/controllers/main_controller.rb:17:in `index'
+  /home/heroku_rack/lib/static_assets.rb:9:in `call'
+  thin (1.0.1) lib/thin/connection.rb:80:in `pre_process'
+  thin (1.0.1) lib/thin/controllers/controller.rb:80:in `start'
+  ...
+</pre>
+
+<p>In this example, you'd want to look at line 17 of main_controller.rb to see what happened.</p>
+
+<p>One of the most common reasons for getting an exception on a freshly pushed app is forgetting to set up your database.  In this case, you'd get a table-not-found PGError.  "heroku rake db:migrate" or "heroku rake db:schema:load" are the usual methods for initializing your database, or you can <a href="http://docs.heroku.com/taps">use Taps to transfer your local database to Heroku</a>.</p>
+
+<p>If your app is receiving traffic other than just you, "heroku logs" may not show enough history to see your exception.  This is by design; any production app receiving traffic should use an exception notifier like <a href="http://hoptoadapp.com/">Hoptoad</a>, <a href="http://getexceptional.com/">Get Exceptional</a>, or <a href="http://github.com/rails/exception_notification/tree/master">exception_notifier</a> to introspect exceptions.</p>
+
+<p>Further reading: <a href="http://docs.heroku.com/logs-exceptions">Heroku docs on logs and exceptions</a></p>
+		</td>
+	</tr>
+</table>

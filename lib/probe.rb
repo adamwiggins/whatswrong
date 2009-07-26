@@ -94,6 +94,10 @@ class Probe < Model
 			end
 		end
 
+		if e.http_code == 500 and e.response.body.match(/We're sorry, but something went wrong/)
+			return :rails_exception
+		end
+
 		if e.http_code == 502 and e.response.body.match(/app failed to start/i)
 			return :app_crashed
 		end
