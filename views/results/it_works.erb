@@ -6,11 +6,16 @@
 	<tr>
 		<th>Details</th>
 		<td>
+			<% details = @probe.result_details %>
 			<ul>
-				<li>HTTP status 200</li>
-				<li>250ms response time</li>
-				<li>3984 bytes text/html response body</li>
-				<li>Served from cache, page is 37 seconds old</li>
+				<li>HTTP status <%= details['http_code'] %></li>
+				<li><%= details['response_time'] %>ms response time</li>
+				<li><%= details['body_size'] %> bytes <%= details['content_type'] %> response body</li>
+				<% if details['cache_age'].to_i > 0 %>
+					<li>Served from cache, page is <%= details['cache_age'] %> seconds old</li>
+				<% else %>
+					<li>Served by a dyno, not from cache</li>
+				<% end %>
 			</ul>
 		</td>
 	</tr>

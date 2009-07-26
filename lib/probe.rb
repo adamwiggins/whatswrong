@@ -6,6 +6,7 @@ class Probe < Model
 	property :url
 	property :state
 	property :result
+	property :result_details
 	property :created_at
 	property :updated_at
 
@@ -46,7 +47,7 @@ class Probe < Model
 				self.state = 'done'
 			end
 		elsif state == 'httpreq'
-			self.result = probe_http
+			self.result, self.result_details = probe_http
 			self.state = 'done'
 		elsif state == 'done'
 			raise ProbeDone
@@ -83,8 +84,18 @@ class Probe < Model
 	end
 
 	def probe_http
+		start = Time.now.to_f
 		res = RestClient.get url
-		return :it_works
+		finish = Time.now.to_f
+
+		details = {
+			'http_code' => res.code,
+			'response_time' => ((finish - start) * 1000).round,
+			'body_size' => res.size,
+			'content_type' => res.headers[:content_type],
+			'cache_age' => res.headers[:age]
+		}
+		return [ :it_works, details ]
 	rescue RestClient::Exception => e
 		if e.http_code == 404 and e.response.body.match(/No such app/)
 			if domain.match(/\.heroku\.com$/)
