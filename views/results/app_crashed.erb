@@ -1,0 +1,31 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td>Your app failed to start.</td>
+	</tr>
+	<tr>
+		<th>Explanation</th>
+		<td>
+Heroku launches your web process using Thin, very similar to running script/server or thin start in your local environment.  If the process exits immediately with a backtrace, Heroku displays this page so that you can diagnose the issue.
+		</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+First, check and make sure your app runs locally.  This may sound obvious, but you'd be surprised. :)  Heroku apps run on Thin (instead of Mongrel or Webbrick), so you might want to "gem install thin" and then "thin start -e production" in your app directory ("thin start -R config.ru -e production" if you're using a Rack app), to get an environment as close as possible to Heroku.
+
+<p>If you're certain it runs locally, then check out these common reasons why an app may fail to boot on Heroku:</p>
+
+<ul>
+	<li>It depends on a gem that is not installed on Heroku.  Vendor it, or add the required gem to your <a href="http://docs.heroku.com/gems">gems manifest</a>.</li>
+	<li>You may have a submodule plugin or gem that is not being pushed.  Heroku doesn't support submodules, see <a href="http://docs.heroku.com/constraints#git-submodules">this</a> for help.</li>
+	<li>Your app may be attempting to write to the filesystem on boot.  If it's writing temporary data, you may need to reconfigure it to use the writeable tmp directory.  <a href="http://docs.heroku.com/constraints#read-only-filesystem">More information.</a>
+</ul>
+
+<p>Experiment with changes you think will help based on the crashlog, then git push again to clear the crashlog and start a new web process with your new code.</p>
+
+<p>If you're stumped, try posting to <a href="http://groups.google.com/group/heroku">the Heroku mailing list</a>.  Cut-and-paste the crashlog when you do.</p>
+
+		</td>
+	</tr>
+</table>

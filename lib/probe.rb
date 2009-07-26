@@ -94,12 +94,12 @@ class Probe < Model
 			end
 		end
 
-		if e.http_code == 503 and e.response.body.match(/Heroku Error/)
-			return :heroku_error
+		if e.http_code == 502 and e.response.body.match(/app failed to start/i)
+			return :app_crashed
 		end
 
-		if e.http_code == 504 and e.response.body.match(/backlog too deep/i)
-			return :backlog_too_deep
+		if e.http_code == 503 and e.response.body.match(/Heroku Error/)
+			return :heroku_error
 		end
 
 		if e.http_code == 504 and e.response.body.match(/backlog too deep/i)
