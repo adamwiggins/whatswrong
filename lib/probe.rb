@@ -93,16 +93,16 @@ class Probe < Model
 				return :domain_not_configured
 			end
 		end
+
+		if e.http_code == 503 and e.response.body.match(/Heroku Error/)
+			return :heroku_error
+		end
+
 		return :it_works
 	end
 
 	def result_type
-		if result.to_s == 'it_works'
-			'it_works'
-		elsif result.to_s == 'ouchie_guy'
-			'heroku_error'
-		else
-			'user_error'
-		end
+		return result if %w(it_works heroku_error).include? result.to_s
+		'user_error'
 	end
 end
