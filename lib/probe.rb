@@ -54,6 +54,14 @@ class Probe < Model
 		end
 	end
 
+	def domain
+		uri.host
+	end
+
+	def uri
+		@uri ||= URI.parse(url)
+	end
+
 	def probe_domain
 		self.url = "http://#{url}.heroku.com/" unless url.match(/\./)
 		self.url = "http://#{url}" unless url.match(/^http:\/\//)
@@ -75,5 +83,15 @@ class Probe < Model
 
 	def probe_http
 		return :it_works
+	end
+
+	def result_type
+		if result.to_s == 'it_works'
+			'it_works'
+		elsif result.to_s == 'ouchie_guy'
+			'heroku_error'
+		else
+			'user_error'
+		end
 	end
 end

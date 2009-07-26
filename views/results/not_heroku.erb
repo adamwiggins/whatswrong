@@ -1,0 +1,21 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td><%= @probe.domain %> does not point to Heroku.</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+Configure your registrar with a CNAME for this domain name pointing at proxy.heroku.com.
+
+<p>You can check whther it's set up correctly at the command prompt with the "host" command.  When it is set up correctly, you'll see something like this:</p>
+
+<pre class="code">
+$ host <%= @probe.domain %>
+<%= @probe.domain %> is an alias for proxy.heroku.com.
+</pre>
+
+<p>Further reading: <a href="http://docs.heroku.com/custom-domains">Heroku docs on custom domains</a></p>
+		</td>
+	</tr>
+</table>

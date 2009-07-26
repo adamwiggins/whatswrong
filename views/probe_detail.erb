@@ -4,11 +4,19 @@
 	<div>Checking domain...<img src="/images/check.png" /></div>
 	<div>Sending an HTTP request...<img src="/images/spinner.gif" /></div>
 <% else @probe.state == 'done' %>
-	<div>Checking domain...<img src="/images/check.png" /></div>
-	<div>Sending an HTTP request...<img src="/images/check.png" /></div>
-	<div class="done">
-		<h4>Probe done</h4>
+	<div class="done <%= @probe.result_type %>">
+		<h4>
+			<% if @probe.result_type == 'heroku_error' %>
+				This is a problem with Heroku.
+			<% elsif @probe.result_type == 'user_error' %>
+				Your app has a problem that you can take action to correct.
+			<% elsif @probe.result_type == 'it_works' %>
+				It works!
+			<% else %>
+				(unknown result)
+			<% end %>
+		</h4>
 
-		<p><%= @probe.result %></p>
+		<p><%= erb :"results/#{@probe.result}", :layout => false %></p>
 	</div>
 <% end %>

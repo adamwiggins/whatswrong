@@ -68,10 +68,45 @@ table {
 	border-collapse: collapse;
 }
 
+h2, h3, h4 {
+	margin: 0;
+}
+
+th {
+	text-align: left;
+	padding-right: 1em;
+}
+th, td {
+	vertical-align: top;
+	padding-bottom: 1em;
+}
+
 .done {
+	margin-top: 1em;
 	padding: 1em;
+}
+
+.user_error {
 	background: #ccf;
 	color: #33a;
 	border: 2px solid #33a;
+}
+.user_error h4 {
+	background: #33a;
+	color: white;
+	padding: 1em;
+}
+
+
+.heroku_error {
+	background: #fcc;
+	color: #a33;
+	border: 2px solid #a33;
+}
+
+.it_works {
+	background: #cfc;
+	color: #3a3;
+	border: 2px solid #3a3;
 }
 
