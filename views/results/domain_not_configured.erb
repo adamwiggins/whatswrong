@@ -1,0 +1,21 @@
+<table>
+	<tr>
+		<th>Diagnosis</th>
+		<td><%= @probe.domain %> has not been configured on Heroku.</td>
+	</tr>
+	<tr>
+		<th nowrap="1">Next steps</th>
+		<td>
+At the command line, run:
+
+<pre class="code">
+$ heroku domains:add <%= @probe.domain %> --app yourapp
+</pre>
+
+Replace "yourapp" with the name of the app you want this domain to access.
+
+<p>Further reading: <a href="http://docs.heroku.com/custom-domains">Heroku docs on custom domains</a></p>
+
+		</td>
+	</tr>
+</table>

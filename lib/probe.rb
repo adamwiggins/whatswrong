@@ -1,4 +1,5 @@
 require 'uri'
+require 'restclient'
 
 class Probe < Model
 	property :id
@@ -82,6 +83,16 @@ class Probe < Model
 	end
 
 	def probe_http
+		res = RestClient.get url
+		return :it_works
+	rescue RestClient::Exception => e
+		if e.http_code == 404 and e.response.body.match(/No such app/)
+			if domain.match(/\.heroku\.com$/)
+				return :no_such_app
+			else
+				return :domain_not_configured
+			end
+		end
 		return :it_works
 	end
 
