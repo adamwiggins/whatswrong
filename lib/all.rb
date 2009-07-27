@@ -1,5 +1,4 @@
 require 'json'
-require 'active_support/core_ext/time'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../vendor/redis'
 require 'redis'
@@ -13,6 +12,12 @@ else
 end
 
 DB = Redis.new(redis_config)
+
+require 'eventmachine'
+require 'Dnsruby'
+
+Dnsruby::Resolver.use_eventmachine
+Dnsruby::Resolver.start_eventmachine_loop(false)
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'model'

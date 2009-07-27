@@ -23,28 +23,21 @@ describe Probe do
 		@probe.normalize_headers([ 'Content-Type: text/html' ]).should == { :content_type => 'text/html' }
 	end
 
-	describe "state machine" do
-		it "start -> probe_domain -> not_heroku" do
-			probe = Probe.new(:state => 'start')
-			probe.stubs(:probe_domain).returns(:not_heroku)
-			probe.perform
-			probe.result.should == :not_heroku
-			probe.state.should == 'done'
+	describe "domain result" do
+		it ":invalid_url when resolver lookup fails" do
+			@probe.domain_result('ERROR', '').should == :invalid_url
 		end
 
-		it "start -> probe_domain -> success, go to httpreq state" do
-			probe = Probe.new(:state => 'start')
-			probe.stubs(:probe_domain).returns(:success)
-			probe.perform
-			probe.result.should == nil
-			probe.state.should == 'httpreq'
+		it ":not_heroku when the domain does not point to proxy.heroku.com" do
+			@probe.domain_result('CNAME', 'google.com').should == :not_heroku
 		end
 
-		it "httpreq -> probe_http -> fires async http request via event machine" do
-			probe = Probe.new(:state => 'httpreq')
-			probe.expects(:probe_http)
-			probe.perform
-			probe.state.should == 'httpreq'
+		it ":success when domain is a CNAME to heroku.com" do
+			@probe.domain_result('CNAME', 'heroku.com').should == :success
+		end
+
+		it ":success when domain is a CNAME to proxy.heroku.com" do
+			@probe.domain_result('CNAME', 'proxy.heroku.com').should == :success
 		end
 	end
 

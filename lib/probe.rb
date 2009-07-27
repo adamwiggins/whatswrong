@@ -51,6 +51,16 @@ class Probe < Model
 		out
 	end
 
+	def domain_result(dnstype, dnsdata)
+		if dnstype == 'CNAME' and dnsdata.match(/heroku\.com$/)
+			:success
+		elsif dnstype == 'ERROR'
+			:invalid_url
+		else
+			:not_heroku
+		end
+	end
+
 	def http_result(response)
 		status = response[:status]
 		body = response[:content] || ''
@@ -114,16 +124,7 @@ class Probe < Model
 		log "Working #{id} #{state}"
 
 		if state == 'start'
-			result = probe_domain
-			if result == :success
-				self.state = 'httpreq'
-			else
-				self.result = result
-				self.state = 'done'
-			end
-			save
-			enqueue if state != 'done'
-			log_state_change
+			probe_domain
 		elsif state == 'httpreq'
 			probe_http
 		elsif state == 'done'
@@ -133,23 +134,47 @@ class Probe < Model
 		end
 	end
 
-	def probe_domain
+	def clean_url
 		self.url = "http://#{url}.heroku.com/" unless url.match(/\./)
 		self.url = "http://#{url}" unless url.match(/^http:\/\//)
+	end
 
-		begin
-			uri = URI.parse(url)
-		rescue URI::InvalidURIError
-			return :invalid_url
+	def probe_domain
+		log "DNS lookup on #{domain}"
+		Probe.underway << self
+
+		dns = Dnsruby::Resolver.new.send_async(Dnsruby::Message.new(domain))
+
+		dns.callback do |msg|
+			Utils.log_exceptions do
+				msg.each_answer do |answer|
+					handle_domain_result(answer.type.to_s, answer.rdata.to_s)
+					break
+				end
+			end
 		end
 
-		return :invalid_url if uri.host.nil?
+		dns.errback do |msg, err|
+			Utils.log_exceptions do
+				handle_domain_result('ERROR', '')
+			end
+		end
+	end
 
-		unless `host #{uri.host}`.match(/heroku\.com\.$/)
-			return :not_heroku
+	def handle_domain_result(dnstype, dnsdata)
+		result = domain_result(dnstype, dnsdata)
+
+		if result == :success
+			self.state = 'httpreq'
+			save
+			enqueue
+		else
+			self.result = result
+			self.state = 'done'
+			save
 		end
 
-		return :success
+		log_state_change
 	end
 
 	attr_accessor :httpreq_start
