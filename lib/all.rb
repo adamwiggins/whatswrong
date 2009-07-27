@@ -14,7 +14,7 @@ end
 DB = Redis.new(redis_config)
 
 require 'eventmachine'
-require 'Dnsruby'
+require 'dnsruby'
 
 Dnsruby::Resolver.use_eventmachine
 Dnsruby::Resolver.start_eventmachine_loop(false)

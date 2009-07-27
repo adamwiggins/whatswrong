@@ -1,0 +1,5 @@
+*.log
+redis-0.900
+.gitconfig
+.[a-f]*
+.[h-z]*
