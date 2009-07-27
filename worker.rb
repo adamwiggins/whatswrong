@@ -1,24 +1,11 @@
 require 'eventmachine'
 require File.dirname(__FILE__) + '/lib/all'
 
-def log(msg)
-	puts "[#{Time.now}] #{msg}"
-end
-
-log "=== Worker starting up"
-
-$httpreqs = []
+Probe.log "=== Worker starting up"
 
 trap 'INT' do
-	log "Shutting down"
-
-	if $httpreqs.size > 0
-		log "(putting #{$httpreqs.size} httpreq probes back into the queue)"
-		$httpreqs.each do |probe|
-			probe.enqueue
-		end
-	end
-
+	Probe.log "Shutting down"
+	Probe.requeue_underway
 	EM.stop
 	exit
 end
@@ -26,32 +13,8 @@ end
 EM.run do
 	EM.add_periodic_timer(1.5) do
 		probe = Probe.pop_queue
-		if probe
-			log "Working #{probe.id} #{probe.state}"
+		next unless probe
 
-			if probe.state == 'httpreq'
-				log "Sending http request to #{probe.url}"
-				probe.httpreq_start = Time.now
-				$httpreqs << probe
-
-			   http = EM::Protocols::HttpClient.request(
-					:host => probe.uri.host, :port => probe.uri.port,
-					:request => probe.uri.path + (probe.uri.query ? "?#{probe.uri.query}" : ""))
-
-	   		http.callback do |r|
-					probe.result, probe.result_details = probe.http_result(r)
-					probe.state = 'done'
-					probe.save
-					log "#{probe.id} next state is #{probe.state} #{probe.result ? "and result is #{probe.result}" : ''}"
-					$httpreqs.delete probe
-			   end
-			else
-				probe.perform
-				probe.save
-				probe.enqueue if probe.state != 'done'
-				log "#{probe.id} next state is #{probe.state} #{probe.result ? "and result is #{probe.result}" : ''}"
-			end
-		end
+		probe.perform
 	end
 end
-

@@ -2,6 +2,11 @@ ENV['REDIS_URL'] = 'redis://localhost:6379/15'
 
 require File.dirname(__FILE__) + '/../lib/all'
 
+class Probe
+	def self.log(msg)
+	end
+end
+
 require 'bacon'
 require 'mocha/api'
 require 'mocha/object'

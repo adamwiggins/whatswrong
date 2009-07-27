@@ -40,12 +40,11 @@ describe Probe do
 			probe.state.should == 'httpreq'
 		end
 
-		it "httpreq -> probe_http -> final state, result is recorded straight to db" do
+		it "httpreq -> probe_http -> fires async http request via event machine" do
 			probe = Probe.new(:state => 'httpreq')
-			probe.stubs(:probe_http).returns(:whatever)
+			probe.expects(:probe_http)
 			probe.perform
-			probe.result.should == :whatever
-			probe.state.should == 'done'
+			probe.state.should == 'httpreq'
 		end
 	end
 

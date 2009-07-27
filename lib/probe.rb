@@ -33,53 +33,12 @@ class Probe < Model
 		super
 	end
 
-	class ProbeDone < RuntimeError; end
-	class UnknownState < RuntimeError; end
-
-	def perform
-		if state == 'start'
-			result = probe_domain
-			if result == :success
-				self.state = 'httpreq'
-			else
-				self.result = result
-				self.state = 'done'
-			end
-		elsif state == 'httpreq'
-			self.result, self.result_details = probe_http
-			self.state = 'done'
-		elsif state == 'done'
-			raise ProbeDone
-		else
-			raise UnknownState, state
-		end
-	end
-
 	def domain
 		uri.host
 	end
 
 	def uri
 		@uri ||= URI.parse(url)
-	end
-
-	def probe_domain
-		self.url = "http://#{url}.heroku.com/" unless url.match(/\./)
-		self.url = "http://#{url}" unless url.match(/^http:\/\//)
-
-		begin
-			uri = URI.parse(url)
-		rescue URI::InvalidURIError
-			return :invalid_url
-		end
-
-		return :invalid_url if uri.host.nil?
-
-		unless `host #{uri.host}`.match(/heroku\.com\.$/)
-			return :not_heroku
-		end
-
-		return :success
 	end
 
 	def normalize_headers(headers)
@@ -91,8 +50,6 @@ class Probe < Model
 		end
 		out
 	end
-
-	attr_accessor :httpreq_start
 
 	def http_result(response)
 		status = response[:status]
@@ -148,5 +105,96 @@ class Probe < Model
 	def result_type
 		return result if %w(it_works heroku_error).include? result.to_s
 		'user_error'
+	end
+
+	class ProbeDone < RuntimeError; end
+	class UnknownState < RuntimeError; end
+
+	def perform
+		log "Working #{id} #{state}"
+
+		if state == 'start'
+			result = probe_domain
+			if result == :success
+				self.state = 'httpreq'
+			else
+				self.result = result
+				self.state = 'done'
+			end
+			save
+			enqueue if state != 'done'
+			log_state_change
+		elsif state == 'httpreq'
+			probe_http
+		elsif state == 'done'
+			raise ProbeDone
+		else
+			raise UnknownState, state
+		end
+	end
+
+	def probe_domain
+		self.url = "http://#{url}.heroku.com/" unless url.match(/\./)
+		self.url = "http://#{url}" unless url.match(/^http:\/\//)
+
+		begin
+			uri = URI.parse(url)
+		rescue URI::InvalidURIError
+			return :invalid_url
+		end
+
+		return :invalid_url if uri.host.nil?
+
+		unless `host #{uri.host}`.match(/heroku\.com\.$/)
+			return :not_heroku
+		end
+
+		return :success
+	end
+
+	attr_accessor :httpreq_start
+
+	def probe_http
+		log "Sending http request to #{url}"
+		httpreq_start = Time.now
+		Probe.underway << probe
+
+		http = EM::Protocols::HttpClient.request(
+			:host => uri.host, :port => uri.port,
+			:request => uri.path + (uri.query ? "?#{uri.query}" : ""))
+
+		http.callback do |response|
+			self.result, self.result_details = http_result(response)
+			self.state = 'done'
+			save
+			log_state_change
+			Probe.underway.delete probe
+		end
+	end
+
+	def log_state_change
+		log "#{id} next state is #{state} #{result ? "and result is #{result}" : ''}"
+	end
+
+	def log(*args)
+		self.class.log args
+	end
+
+	def self.log(msg)
+		puts "[#{Time.now}] #{msg}"
+	end
+
+	def self.underway
+		@underway ||= []
+	end
+
+	def self.requeue_underway
+		return if underway.empty?
+
+		log "Putting #{underway.size} httpreq probes back into the queue"
+		underway.each do |probe|
+			probe.enqueue
+		end
+		underway.clear
 	end
 end
