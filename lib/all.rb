@@ -17,3 +17,4 @@ DB = Redis.new(redis_config)
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'model'
 require 'probe'
+require 'utils'

@@ -157,19 +157,26 @@ class Probe < Model
 	def probe_http
 		log "Sending http request to #{url}"
 		httpreq_start = Time.now
-		Probe.underway << probe
+		Probe.underway << self
 
 		http = EM::Protocols::HttpClient.request(
 			:host => uri.host, :port => uri.port,
 			:request => uri.path + (uri.query ? "?#{uri.query}" : ""))
 
 		http.callback do |response|
-			self.result, self.result_details = http_result(response)
-			self.state = 'done'
-			save
-			log_state_change
-			Probe.underway.delete probe
+			Utils.log_exceptions do
+				handle_http_result(response)
+			end
 		end
+	end
+
+	def handle_http_result(response)
+		self.result, self.result_details = http_result(response)
+		self.state = 'done'
+		save
+
+		log_state_change
+		Probe.underway.delete self
 	end
 
 	def log_state_change

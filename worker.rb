@@ -12,9 +12,9 @@ end
 
 EM.run do
 	EM.add_periodic_timer(1.5) do
-		probe = Probe.pop_queue
-		next unless probe
-
-		probe.perform
+		Utils.log_exceptions do
+			probe = Probe.pop_queue
+			probe.perform if probe
+		end
 	end
 end
