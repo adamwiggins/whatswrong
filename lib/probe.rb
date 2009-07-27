@@ -92,6 +92,8 @@ class Probe < Model
 		out
 	end
 
+	attr_accessor :httpreq_start
+
 	def http_result(response)
 		status = response[:status]
 		body = response[:content] || ''
@@ -100,7 +102,7 @@ class Probe < Model
 		if status.to_s.match(/^2\d\d$/)
 			details = {
 				'http_code' => status,
-#				'response_time' => ((finish - start) * 1000).round,
+				'response_time' => ((Time.now.to_f - httpreq_start.to_f) * 1000).round,
 				'body_size' => body.size,
 				'content_type' => headers[:content_type],
 				'cache_age' => headers[:age],

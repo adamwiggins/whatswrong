@@ -31,9 +31,12 @@ EM.run do
 
 			if probe.state == 'httpreq'
 				log "Sending http request to #{probe.url}"
+				probe.httpreq_start = Time.now
 				$httpreqs << probe
 
-			   http = EM::Protocols::HttpClient.request(:host => probe.uri.host, :port => probe.uri.port, :request => probe.uri.path)
+			   http = EM::Protocols::HttpClient.request(
+					:host => probe.uri.host, :port => probe.uri.port,
+					:request => probe.uri.path + (probe.uri.query ? "?#{probe.uri.query}" : ""))
 
 	   		http.callback do |r|
 					probe.result, probe.result_details = probe.http_result(r)

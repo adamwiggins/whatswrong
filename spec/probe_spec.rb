@@ -55,9 +55,14 @@ describe Probe do
 		end
 
 		it ":it_works returns full details (http code, body size, etc)" do
+			@probe.httpreq_start = 1
+			Time.stubs(:now).returns(2)
+
 			result, details = @probe.http_result(:status => 201, :content => 'abcd', :headers => [ "Content-type: text/plain", "Age: 10" ])
+
 			details.should == {
 				'http_code' => 201,
+				'response_time' => 1000,
 				'body_size' => 4,
 				'content_type' => 'text/plain',
 				'cache_age' => '10',
