@@ -181,7 +181,7 @@ class Probe < Model
 
 	def probe_http
 		log "Sending http request to #{url}"
-		httpreq_start = Time.now
+		self.httpreq_start = Time.now
 		Probe.underway << self
 
 		http = EM::Protocols::HttpClient.request(
