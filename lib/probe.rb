@@ -132,6 +132,14 @@ class Probe < Model
 		return :app_exception
 	end
 
+	def self.http_result(response)
+		if response[:status].to_s.match(/^2\d\d$/)
+			return :it_works
+		else
+			return :app_exception
+		end
+	end
+
 	def result_type
 		return result if %w(it_works heroku_error).include? result.to_s
 		'user_error'

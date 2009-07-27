@@ -6,7 +6,7 @@
 	<tr>
 		<th>Details</th>
 		<td>
-			<% details = @probe.result_details %>
+			<% details = @probe.result_details || {} %>
 			<ul>
 				<li>HTTP status <%= details['http_code'] %></li>
 				<li><%= details['response_time'] %>ms response time</li>

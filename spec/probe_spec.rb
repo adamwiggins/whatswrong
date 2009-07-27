@@ -40,4 +40,14 @@ describe Probe do
 			probe.state.should == 'done'
 		end
 	end
+
+	describe "http result" do
+		it ":it_works when status code is 200" do
+			Probe.http_result(:status => 200).should == :it_works
+		end
+
+		it ":app_exception when status code is 500" do
+			Probe.http_result(:status => 500).should == :app_exception
+		end
+	end
 end
