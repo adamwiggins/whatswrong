@@ -1,5 +1,4 @@
 require 'uri'
-require 'restclient'
 
 class Probe < Model
 	property :id
@@ -83,21 +82,33 @@ class Probe < Model
 		return :success
 	end
 
-	def probe_http
-		start = Time.now.to_f
-		res = RestClient.get url
-		finish = Time.now.to_f
+	def normalize_headers(headers)
+		out = {}
+		headers.each do |string|
+			key, value = string.split(': ', 2)
+			key = key.downcase.gsub(/-/, '_').to_sym
+			out[key] = value
+		end
+		out
+	end
 
-		details = {
-			'http_code' => res.code,
-			'response_time' => ((finish - start) * 1000).round,
-			'body_size' => res.size,
-			'content_type' => res.headers[:content_type],
-			'cache_age' => res.headers[:age]
-		}
-		return [ :it_works, details ]
-	rescue RestClient::Exception => e
-		if e.http_code == 404 and e.response.body.match(/No such app/)
+	def http_result(response)
+		status = response[:status]
+		body = response[:content] || ''
+		headers = normalize_headers response[:headers] || []
+
+		if status.to_s.match(/^2\d\d$/)
+			details = {
+				'http_code' => status,
+#				'response_time' => ((finish - start) * 1000).round,
+				'body_size' => body.size,
+				'content_type' => headers[:content_type],
+				'cache_age' => headers[:age],
+			}
+			return [ :it_works, details ]
+		end
+
+		if status == 404 and body.match(/No such app/)
 			if domain.match(/\.heroku\.com$/)
 				return :no_such_app
 			else
@@ -105,39 +116,31 @@ class Probe < Model
 			end
 		end
 
-		if e.http_code == 500 and e.response.body.match(/We're sorry, but something went wrong/)
+		if status == 500 and body.match(/We're sorry, but something went wrong/)
 			return :rails_exception
 		end
 
-		if e.http_code == 502 and e.response.body.match(/app failed to start/i)
+		if status == 502 and body.match(/app failed to start/i)
 			return :app_crashed
 		end
 
-		if e.http_code == 503 and e.response.body.match(/Heroku Error/)
+		if status == 503 and body.match(/Heroku Error/)
 			return :heroku_error
 		end
 
-		if e.http_code == 504 and e.response.body.match(/backlog too deep/i)
+		if status == 504 and body.match(/backlog too deep/i)
 			return :backlog_too_deep
 		end
 
-		if e.http_code == 504 and e.response.body.match(/request timed out/i)
+		if status == 504 and body.match(/request timed out/i)
 			return :request_timeout
 		end
 
-		if e.http_code == 504 and e.response.body.match(/request timed out/i)
+		if status == 504 and body.match(/request timed out/i)
 			return :request_timeout
 		end
 
 		return :app_exception
-	end
-
-	def self.http_result(response)
-		if response[:status].to_s.match(/^2\d\d$/)
-			return :it_works
-		else
-			return :app_exception
-		end
 	end
 
 	def result_type

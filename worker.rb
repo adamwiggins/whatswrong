@@ -36,7 +36,7 @@ EM.run do
 			   http = EM::Protocols::HttpClient.request(:host => probe.uri.host, :port => probe.uri.port, :request => probe.uri.path)
 
 	   		http.callback do |r|
-					probe.result, probe.result_details = Probe.http_result(r)
+					probe.result, probe.result_details = probe.http_result(r)
 					probe.state = 'done'
 					probe.save
 					log "#{probe.id} next state is #{probe.state} #{probe.result ? "and result is #{probe.result}" : ''}"
