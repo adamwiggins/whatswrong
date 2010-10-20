@@ -14,6 +14,8 @@ end
 DB = Redis.new(redis_config)
 
 require 'eventmachine'
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../vendor/Dnsruby-1.0'
 require 'dnsruby'
 
 Dnsruby::Resolver.use_eventmachine
